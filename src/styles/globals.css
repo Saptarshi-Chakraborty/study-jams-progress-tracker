@@ -1,0 +1,8 @@
+@font-face {
+  font-family: "GoogleSans"; /* Name your font family */
+  src: url("/google_sans_font.ttf"); /* Locate the .ttf file within your directory*/
+}
+
+* {
+  font-family: "GoogleSans", sans-serif;
+}

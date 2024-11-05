@@ -1,4 +1,5 @@
 import HomeBody from "@/component/index/Body";
+import Navbar from "@/component/Navbar";
 import Head from "next/head";
 
 
@@ -9,6 +10,7 @@ export default function Home() {
       <meta name="description" content="Study Jams Progress Tracker" />
     </Head>
 
+    <Navbar />
     <HomeBody />
 
   </>);
