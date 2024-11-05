@@ -103,23 +103,29 @@ const UploadPageBody = () => {
                     queryData,
                 );
 
-                console.log('Database Result:')
-                console.log(result)
+                // console.log('Database Result:')
+                // console.log(result)
 
-                toast.success('Data submitted successfully');
+                // toast.success('Data submitted successfully');
                 setCurrentUploadIndex(i + 1);
+                console.log(`uploaded ${i + 1} of ${data.length}`)
 
-                await sleep(3000);
+                // await sleep(3000);
+                // console.log('Sleeping for 3 seconds')
 
-                console.log('Sleeping for 3 seconds')
 
             } catch (e) {
                 console.log(e)
                 toast.error('Error submitting data');
                 setFailedUploads([...failedUploads, item]);
             }
-            break;
-        }
+            // break;
+        } // loop end
+
+        console.log('Loop End')
+        toast.success("All data uploaded");
+        setDate('');
+        setFile('');
 
     }
 

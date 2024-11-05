@@ -1,3 +1,5 @@
+"use client";
+
 import Navbar from '@/component/Navbar';
 import UploadPageBody from '@/component/upload/Body';
 import Head from 'next/head';
