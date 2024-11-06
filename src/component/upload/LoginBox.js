@@ -1,10 +1,11 @@
 "use client";
 
 import appwrite from '@/utils/appwrite';
-import React, { useEffect, useLayoutEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify';
 
 const LoginBox = ({ user, setUser }) => {
+    const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [otp, setOTP] = useState('')
     const [otpSent, setOTPSent] = useState(false)
@@ -15,35 +16,27 @@ const LoginBox = ({ user, setUser }) => {
         let session;
         try {
             session = await appwrite.account.get();
-            console.log("User already logged in", session);
+            setUser(session);
 
-            await appwrite.account.deleteSession('current');
         } catch (error) {
-            console.log("User not already logged in");
-        } 
-    }
+            console.log("User not logged in");
+        }
 
-    async function checkLogin() {
-        if (user) return;
+        if (!session) return;
+
         try {
-            setLoading(true);
-            const account = await appwrite.account.get();
-            console.log(account);
+            await appwrite.account.deleteSession('current');
 
-            console.log('User already logged in');
-
-            await logout();
+            setUser(null);
+            window.location.reload();
         } catch (error) {
-            console.log(error);
-        } finally {
-            setLoading(false);
+            console.error('Failed to logout', error);
+            toast.error('Failed to logout');
         }
     }
 
     async function sendOTP(e) {
         e.preventDefault();
-
-        await logout();
 
         const emailAddress = email.trim();
         if (!emailAddress) {
@@ -83,6 +76,7 @@ const LoginBox = ({ user, setUser }) => {
         }
 
 
+
         try {
             const session = await appwrite.account.createSession(
                 userId,
@@ -104,10 +98,51 @@ const LoginBox = ({ user, setUser }) => {
 
     }
 
-    // useLayoutEffect(() => {
-    //     logout();
-    // }, [])
+    async function checkLogin() {
+        if (user) return;
+        try {
+            setLoading(true);
+            const account = await appwrite.account.get();
+            console.log(account);
 
+            console.log('User already logged in');
+            setUser(account);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function changeName(e) {
+        e.preventDefault();
+
+        if (!user) {
+            toast.error('Please login first');
+            return;
+        }
+
+        const chapterName = name.trim();
+        if (chapterName.length < 3) {
+            toast.error('Name cannot be empty');
+            return;
+        }
+
+
+        try {
+            const result = await appwrite.account.updateName(name);
+            console.log(result);
+            toast.success('Name updated successfully');
+
+            const account = await appwrite.account.get();
+            console.log(account);
+
+            setUser(account);
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to update name');
+        }
+    }
 
     useLayoutEffect(() => {
         checkLogin();
@@ -116,26 +151,44 @@ const LoginBox = ({ user, setUser }) => {
     return (
         <>
             {
-                user &&
-                <h5>Welcome, {user.email}
-                    {/* <button onClick={() => {
-                        // logout();
-                        window.location.reload();
-                    }}className='btn btn-danger btn-sm ms-2'>Logout</button> */}
-                </h5>
+                (user && user.name.length > 3) &&
+                <div>
+                    <h5>Welcome, {user?.name}</h5>
+                    <h6 className="font-monospace">{user?.email}</h6>
+                    {
+                        user.labels.includes('organizer') &&
+                        <span className='badge bg-success small ms-2'>Organizer</span>
+                    }
+
+                    <button onClick={logout} className='btn btn-danger btn-sm ms-2'>Logout</button>
+                </div>
+            }
+
+            {
+                (user && user.name === '') &&
+                <div>
+                    <form onSubmit={changeName}>
+                        <div className='mb-3'>
+                            <label className='form-label' htmlFor='chapter'>Chapter Name</label>
+                            <input value={name} onChange={e => setName(e.target.value)} type='text' className='form-control' id='chapter' placeholder='Enter your chapter name' />
+                        </div>
+                        <button type='submit' className='btn btn-primary'>Submit</button>
+                    </form>
+                    <div className='alert alert-warning my-3'>Please add your Chapter Name to proceess further</div>
+                </div>
             }
 
 
             {
-                (user === null) &&
+                (user === null && loading != true) &&
                 <div className='card'>
                     <div className='card-body'>
                         {
                             otpSent ||
                             <form onSubmit={sendOTP}>
                                 <div className='mb-3'>
-                                    <label className='form-label' htmlFor='username'>Study Jams Email Id</label>
-                                    <input value={email} onChange={e => setEmail(e.target.value)} type='text' className='form-control' id='username' placeholder='Enter your study jams registered email id' />
+                                    <label className='form-label' htmlFor='username'>Organizer's Primary Email Id</label>
+                                    <input value={email} onChange={e => setEmail(e.target.value)} type='text' className='form-control' id='username' placeholder='Enter your primary email id' />
                                     <p className='form-text'>We will send an OTP to this email id</p>
                                 </div>
                                 <button type='submit' className='btn btn-primary'>Send OTP</button>
@@ -155,6 +208,10 @@ const LoginBox = ({ user, setUser }) => {
                                 <button type='submit' className='btn btn-primary'>Login</button>
                             </form>
                         }
+                    </div>
+
+                    <div className='card-footer'>
+                        This page is only for partnered GDG On Campus Organizers. If you are not an Chapter Organizer, please close this page.
                     </div>
                 </div>
             }

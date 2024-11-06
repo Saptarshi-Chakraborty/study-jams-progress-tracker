@@ -16,6 +16,7 @@ const appwrite = {
     PROJECT_ID: 'study-jams-progress-tracker',
     DATABASE_ID: 'study-jams-progress',
     REPORT_COLLECTION_ID: '672906e4003028ae2510',
+    REPORT_DETAILS_COLLECTION_ID: 'report-details',
 };
 
 

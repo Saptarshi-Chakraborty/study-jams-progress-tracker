@@ -5,12 +5,15 @@ import CSVReader from 'react-csv-reader'
 import appwrite from '@/utils/appwrite';
 
 
-const UploadPageBody = () => {
-    const [date, setDate] = useState('')
-    const [file, setFile] = useState('')
-    const [data, setData] = useState([])
+const UploadBox = ({ user, setUser }) => {
+    const [loading, setLoading] = useState(false);
+    const [date, setDate] = useState('');
+    const [file, setFile] = useState('');
+    const [data, setData] = useState([]);
     const [failedUploads, setFailedUploads] = useState([]);
     const [currentUploadIndex, setCurrentUploadIndex] = useState(0);
+    const [reportDetails, setReportDetails] = useState({ noOfSkillsBageCompletion: 0, noOfArcadeGamesCompletion: 0, noOfParticipants: 0, noOfAllCompleted: 0 });
+    const [reportDetailsId, setReportDetailsId] = useState('')
 
 
     async function onCompleteParsing(result) {
@@ -45,6 +48,32 @@ const UploadPageBody = () => {
         console.log(originalFile)
 
         setData(data)
+
+        // further calculations
+        let noOfSkillsBageCompletion = 0;
+        let noOfArcadeGamesCompletion = 0;
+        let noOfAllCompleted = 0;
+
+        await data.forEach(item => {
+            if (item['# of Skill Badges Completed'] === undefined) return;
+            if (item['# of Arcade Games Completed'] === undefined) return;
+
+            if (item['# of Skill Badges Completed'] == "15")
+                noOfSkillsBageCompletion += 1;
+
+            if (item['# of Arcade Games Completed'] == "1")
+                noOfArcadeGamesCompletion += 1;
+
+            if (item['All Skill Badges & Games Completed'] === "Yes")
+                noOfAllCompleted += 1;
+        });
+
+        setReportDetails({
+            noOfSkillsBageCompletion,
+            noOfArcadeGamesCompletion,
+            noOfAllCompleted,
+            noOfParticipants: data.length
+        })
     }
 
     async function onFileError(error, file, inputElem, reason) {
@@ -60,6 +89,55 @@ const UploadPageBody = () => {
         toast.error('Error loading file')
     }
 
+    async function submitReportDetails() {
+        if (!user) {
+            toast.error('User not found');
+            return;
+        }
+        if (user.name.length < 3) {
+            toast.error('Name of the user not found');
+            return;
+        }
+
+        const entryData = {
+            uploadedBy: user.$id,
+            chapterName: user.name,
+            noOfParticipants: reportDetails.noOfParticipants,
+            noOfSkillsBageCompletion: reportDetails.noOfSkillsBageCompletion,
+            noOfArcadeGamesCompletion: reportDetails.noOfArcadeGamesCompletion,
+            noOfAllCompleted: reportDetails.noOfAllCompleted,
+            reportDate: new Date(date).toISOString()
+        }
+
+
+        try {
+            setLoading(true);
+            const result = await appwrite.database.createDocument(
+                appwrite.DATABASE_ID,
+                appwrite.REPORT_DETAILS_COLLECTION_ID,
+                appwrite.ID.unique(),
+                entryData,
+                [
+                    appwrite.Permission.read(appwrite.Role.user(user.$id)), // only user can read
+                    appwrite.Permission.delete(appwrite.Role.user(user.$id)), // only user can delete
+                    appwrite.Permission.update(appwrite.Role.user(user.$id)), // only user can update
+                ]
+            );
+
+            console.log('Database Result:')
+            console.log(result)
+
+            toast.success('Daily Report Record Created. Starting Uploading data');
+            setReportDetailsId(result.$id);
+        } catch (e) {
+            console.log(e)
+            toast.error('Error submitting report details');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+
     async function submitData(e) {
         e.preventDefault()
         setCurrentUploadIndex(0);
@@ -71,6 +149,9 @@ const UploadPageBody = () => {
 
         console.log('Report date:')
         console.log(date)
+
+        await submitReportDetails();
+        // return;
 
         for (let i = 0; i < data.length; i++) {
             const index = 23;
@@ -87,13 +168,15 @@ const UploadPageBody = () => {
                 completedSkillBadges: parseSkillBadgesNames(item['Names of Completed Skill Badges']),
                 noOfArcadeGamesCompleted: String(item['# of Arcade Games Completed']),
                 arcadeGamesCompleted: parseArcadeGamesNames(item['Names of Completed Arcade Games']),
-                uploadedBy: "admin",
-                reportDate: new Date(date).toISOString()
+                uploadedBy: user.$id,
+                reportDate: new Date(date).toISOString(),
+                reportId: reportDetailsId,
             }
 
             console.log('Query data:')
             console.log(queryData)
 
+            setLoading(true);
             // break;
             try {
                 const result = await appwrite.database.createDocument(
@@ -101,18 +184,21 @@ const UploadPageBody = () => {
                     appwrite.REPORT_COLLECTION_ID,
                     appwrite.ID.unique(),
                     queryData,
+                    [
+                        appwrite.Permission.update(appwrite.Role.user(user.$id)), // only user can update
+                        appwrite.Permission.delete(appwrite.Role.user(user.$id)), // only user can delete
+                    ]
                 );
 
                 // console.log('Database Result:')
                 // console.log(result)
-
                 // toast.success('Data submitted successfully');
+
                 setCurrentUploadIndex(i + 1);
                 console.log(`uploaded ${i + 1} of ${data.length}`)
 
                 // await sleep(3000);
                 // console.log('Sleeping for 3 seconds')
-
 
             } catch (e) {
                 console.log(e)
@@ -122,11 +208,12 @@ const UploadPageBody = () => {
             // break;
         } // loop end
 
+
         console.log('Loop End')
         toast.success("All data uploaded");
         setDate('');
         setFile('');
-
+        setLoading(false);
     }
 
     function parseSkillBadgesNames(string) {
@@ -154,16 +241,13 @@ const UploadPageBody = () => {
     }
 
 
-
-
-    return (<main className='container my-3'>
-
-        <h1>Upload Page</h1>
+    return (<div className='my-3'>
+        <h5>Upload the progress report</h5>
         <div >
             {/* Date input */}
             <div className="mb-3">
                 <label htmlFor="date" className="form-label">Report Date</label>
-                <input value={date} onChange={e => setDate(e.target.value)} type="date" className="form-control" id="date" />
+                <input value={date} onChange={e => setDate(e.target.value)} type="date" className="form-control" id="date" disabled={loading} />
             </div>
 
             {/* File Input */}
@@ -177,6 +261,7 @@ const UploadPageBody = () => {
                     onFileLoaded={onFileLoaded}
                     onError={onFileError}
                     parserOptions={papaparseOptions}
+                    disabled={loading}
                 />
             </div>
 
@@ -185,13 +270,27 @@ const UploadPageBody = () => {
                 <p>File Parsed. {data.length} number of entries found excluding header</p>
             }
 
-            <button type="button" onClick={submitData} className="btn btn-primary">Submit</button>
-
             {
-                data.length > 0 &&
-                <p>Data Uploaded: {currentUploadIndex}/{data.length}</p>
+                (reportDetails.noOfParticipants > 0) &&
+                <div>
+                    <h5>Report Details</h5>
+                    <ul>
+                        <li>Total Participants: {reportDetails.noOfParticipants}</li>
+                        <li>Skills Badge Completion: {reportDetails.noOfSkillsBageCompletion}</li>
+                        <li>Arcade Games Completion: {reportDetails.noOfArcadeGamesCompletion}</li>
+                        <li>All Completed: {reportDetails.noOfAllCompleted}</li>
+                    </ul>
+                </div>
             }
 
+            <button type="button" onClick={submitData} className="btn btn-primary" disabled={loading}>Upload Report</button>
+
+            {
+                (data.length > 0) &&
+                <span className='ms-3'>Uploaded {currentUploadIndex}/{data.length}</span>
+            }
+
+            <p className="fw-bold mt-1">Don't close the page or do anything when the report is uploading. Else it can cause data loss</p>
         </div>
 
         {
@@ -212,7 +311,7 @@ const UploadPageBody = () => {
 
 
 
-    </main>)
+    </div>)
 }
 
-export default UploadPageBody
+export default UploadBox

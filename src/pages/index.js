@@ -16,7 +16,7 @@ export default function Home() {
 
     <Navbar />
     <HomeBody />
-    <ToastContainer theme='colored' position='top-center' />
+    <ToastContainer theme='colored' position='top-center' autoClose={2000}/>
 
   </>);
 }

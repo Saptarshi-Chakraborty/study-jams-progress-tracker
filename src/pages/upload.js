@@ -1,7 +1,8 @@
 "use client";
 
 import Navbar from '@/component/Navbar';
-import UploadPageBody from '@/component/upload/Body';
+import UploadBody from '@/component/upload/UploadBody';
+import UploadPageBody from '@/component/upload/UploadBox';
 import Head from 'next/head';
 import React from 'react'
 import { ToastContainer, toast } from 'react-toastify';
@@ -14,7 +15,7 @@ const upload = () => {
         </Head>
 
         <Navbar />
-        <UploadPageBody />
+        <UploadBody />
         <ToastContainer theme='colored' position='top-center' />
     </>);
 }
