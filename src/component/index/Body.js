@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useLayoutEffect, useState } from 'react'
-import LoginBox from './LoginBox'
 import appwrite from '@/utils/appwrite';
-import ProgressReportBox from './ProgressReportBox';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import LoginBox from './LoginBox';
+import ProgressReportBox from './ProgressReportBox';
 
 const HomeBody = () => {
     const [user, setUser] = useState(null);
@@ -135,9 +135,6 @@ const HomeBody = () => {
                     className="btn btn-warning">Try Again</button>
             </div>
         }
-
-
-
 
     </main >)
 }

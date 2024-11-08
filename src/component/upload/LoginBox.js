@@ -38,7 +38,7 @@ const LoginBox = ({ user, setUser }) => {
     async function sendOTP(e) {
         e.preventDefault();
 
-        const emailAddress = email.trim();
+        const emailAddress = email.trim().toLowerCase();
         if (!emailAddress) {
             toast.error('Please enter a valid email address');
             return;
@@ -157,7 +157,7 @@ const LoginBox = ({ user, setUser }) => {
                     <h6 className="font-monospace">{user?.email}</h6>
                     {
                         user.labels.includes('organizer') &&
-                        <span className='badge bg-success small ms-2'>Organizer</span>
+                        <span className='badge bg-success small'>Organizer</span>
                     }
 
                     <button onClick={logout} className='btn btn-danger btn-sm ms-2'>Logout</button>
@@ -187,8 +187,8 @@ const LoginBox = ({ user, setUser }) => {
                             otpSent ||
                             <form onSubmit={sendOTP}>
                                 <div className='mb-3'>
-                                    <label className='form-label' htmlFor='username'>Organizer's Primary Email Id</label>
-                                    <input value={email} onChange={e => setEmail(e.target.value)} type='text' className='form-control' id='username' placeholder='Enter your primary email id' />
+                                    <label className='form-label' htmlFor='email'>Organizer's Primary Email Id</label>
+                                    <input value={email} onChange={e => setEmail(e.target.value)} type='text' className='form-control text-lowercase' id='email' placeholder='Enter your primary email id' />
                                     <p className='form-text'>We will send an OTP to this email id</p>
                                 </div>
                                 <button type='submit' className='btn btn-primary'>Send OTP</button>

@@ -20,7 +20,7 @@ const LoginBox = ({ user, setUser }) => {
             await appwrite.account.deleteSession('current');
         } catch (error) {
             console.log("User not already logged in");
-        } 
+        }
     }
 
     async function checkLogin() {
@@ -45,7 +45,7 @@ const LoginBox = ({ user, setUser }) => {
 
         await logout();
 
-        const emailAddress = email.trim();
+        const emailAddress = email.trim().toLowerCase();
         if (!emailAddress) {
             toast.error('Please enter a valid email address');
             return;
@@ -56,7 +56,7 @@ const LoginBox = ({ user, setUser }) => {
                 appwrite.ID.unique(),
                 emailAddress,
             );
-
+            
             console.log(sessionToken);
             toast.success('OTP sent');
 
@@ -65,8 +65,9 @@ const LoginBox = ({ user, setUser }) => {
         } catch (error) {
             console.log(error);
             toast.error('Failed to send OTP');
+            // toast.error(error.message);
+            // alert(`${JSON.stringify(Object(error))}`);
         }
-
     }
 
     async function verifyOTP(e) {
@@ -134,9 +135,9 @@ const LoginBox = ({ user, setUser }) => {
                             otpSent ||
                             <form onSubmit={sendOTP}>
                                 <div className='mb-3'>
-                                    <label className='form-label' htmlFor='username'>Study Jams Email Id</label>
-                                    <input value={email} onChange={e => setEmail(e.target.value)} type='text' className='form-control' id='username' placeholder='Enter your study jams registered email id' />
-                                    <p className='form-text'>We will send an OTP to this email id</p>
+                                    <label className='form-label' htmlFor='email'>Study Jams Email Id</label>
+                                    <input value={email} onChange={e => setEmail(e.target.value)} type='text' className='form-control text-lowercase' id='email' placeholder='Enter your study jams registered email id' />
+                                    <p className='form-text'>We will send an OTP to this email address</p>
                                 </div>
                                 <button type='submit' className='btn btn-primary'>Send OTP</button>
                             </form>

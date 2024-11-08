@@ -14,16 +14,40 @@ const ProgressReportBox = ({ user, progressReport }) => {
     const allGames = ALL_ARCADE_GAMES;
     const allSkillBadges = ALL_SKILL_BADGES;
 
+    async function shareToSocialMedia() {
+        const shareData = {
+            title: 'GenAI Study Jams 2024 Progress Report',
+            text: 'Check out your progress report for GenAI Study Jams 2024',
+            url: "https://study-jams-progress.pages.dev",
+        };
+
+        try {
+            await navigator.share(shareData);
+        } catch (error) {
+            console.error('Failed to share', error);
+            toast.error('Failed to share');
+        }
+    }
 
     return (
         <div>
-            <Link href={progressReport.profileUrl} className="fs-5 link-primary link-offset-2" target="_blank">Your Profile URL</Link>
-            <p className="text-muted my-1">Last Updated On: <span className='fw-bold text-dark'>{reportDate.toDateString()}</span></p>
+            <Link href={progressReport.profileUrl} className="fs-5 link-primary link-offset-2" target="_blank">Your Public Profile</Link>
+            <p className=" my-1">Report Last Updated On: <span className='fw-bold text-dark'>{reportDate.toDateString()}</span></p>
 
 
             <p>Both Access Code Redeemed: {progressReport?.codeRedemptionStatus == "Yes" ?
                 <span className="badge bg-success">Yes</span> : <span className="badge bg-danger">No</span>
             }</p>
+
+            <p>
+                <button onClick={shareToSocialMedia} className='btn btn-primary fs-6 py-1 px-3 rounded-pill'>Share</button>
+            </p>
+
+            {/* All Completed Congratulations Message */}
+            {
+                (progressReport?.codeRedemptionStatus == "Yes" && progressReport.noOfArcadeGamesCompleted == 1 && progressReport.noOfSkillBadgesCompleted == 15) &&
+                <div className="alert alert-success">Congratulations! 🎉 You have completed all the requirements for the GenAI Study Jams 2024 🚀</div>
+            }
 
             {/* Arcade Game Progress */}
             <div className="card mb-3">
@@ -74,11 +98,6 @@ const ProgressReportBox = ({ user, progressReport }) => {
                     }
                 </div>
             </div>
-
-            {
-                (progressReport?.codeRedemptionStatus == "Yes" && progressReport.noOfArcadeGamesCompleted == 1 && progressReport.noOfSkillBadgesCompleted == 15) &&
-                <div className="alert alert-success">Congratulations! 🎉 You have completed all the requirements for the GenAI Study Jams 2024 🚀</div>
-            }
 
         </div >
     )

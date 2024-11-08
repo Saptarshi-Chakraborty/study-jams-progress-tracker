@@ -1,5 +1,6 @@
 "use client";
 
+import Footer from '@/component/Footer';
 import Navbar from '@/component/Navbar';
 import UploadBody from '@/component/upload/UploadBody';
 import UploadPageBody from '@/component/upload/UploadBox';
@@ -16,6 +17,7 @@ const upload = () => {
 
         <Navbar />
         <UploadBody />
+        <Footer />
         <ToastContainer theme='colored' position='top-center' />
     </>);
 }
