@@ -141,6 +141,9 @@ const DashboardBody = () => {
 
                     <h3 className="mt-4">All Uploaded Reports</h3>
                     <ReportsTable allReports={allReports} />
+
+                    <h3 className="mt-4">Participants Details</h3>
+
                 </>
             }
 

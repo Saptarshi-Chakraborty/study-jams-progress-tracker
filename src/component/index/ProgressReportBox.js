@@ -99,6 +99,14 @@ const ProgressReportBox = ({ user, progressReport }) => {
                 </div>
             </div>
 
+            {
+                (progressReport?.chapterName) &&
+                <p className="my-2 fs-6">You are registered under the chapter:{" "}
+                    <span className="text-dark fs-5 fw-semibold">{progressReport.chapterName}</span>
+                </p>
+
+            }
+
         </div >
     )
 }

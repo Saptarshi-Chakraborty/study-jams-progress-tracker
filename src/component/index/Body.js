@@ -22,7 +22,6 @@ const HomeBody = () => {
         }
     }
 
-
     const fetchProgressReport = async () => {
         if (!user || user.email === undefined) return;
         if (progressReport) return;
@@ -61,8 +60,10 @@ const HomeBody = () => {
 
             setHasFetched(true);
 
+            await fetchChapterName(result.documents[0].reportId);
+
             // logout automatically
-            await appwrite.account.deleteSession('current');
+            // await appwrite.account.deleteSession('current');
 
         } catch (error) {
             console.error('Failed to fetch progress report', error);
@@ -85,6 +86,42 @@ const HomeBody = () => {
             console.error('Failed to logout', error);
             toast.error('Failed to logout');
         }
+    }
+
+    async function fetchChapterName(reportId) {
+        if (!user) return;
+
+        console.log(`Report ID: ${reportId}`);
+
+        try {
+            const response = await appwrite.database.getDocument(
+                appwrite.DATABASE_ID,
+                appwrite.REPORT_DETAILS_COLLECTION_ID,
+                reportId,
+                [
+                    appwrite.Query.select(['chapterName']),
+                ]
+            );
+
+            console.log(response);
+
+            if ((response.chapterName === undefined) || (response.chapterName === null)) {
+                console.log('Chapter name not found');
+                return;
+            }
+
+            setProgressReport(prev => {
+                return {
+                    ...prev,
+                    chapterName: response.chapterName
+                }
+            });
+
+        } catch (error) {
+            console.error('Failed to fetch chapter name', error);
+            toast.error('Failed to fetch chapter name');
+        }
+
     }
 
     useEffect(() => {
