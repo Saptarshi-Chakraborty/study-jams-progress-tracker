@@ -275,7 +275,7 @@ const UploadBox = ({ user, setUser }) => {
                     type="file" accept=".csv" className="form-control" id="file" /> */}
 
                 <CSVReader
-                    cssClass="form-control"
+                    cssclassName="form-control"
                     onFileLoaded={onFileLoaded}
                     onError={onFileError}
                     parserOptions={papaparseOptions}

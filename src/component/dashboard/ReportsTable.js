@@ -14,11 +14,11 @@ const ReportsTable = ({ allReports }) => {
         console.log(`oldValue: ${oldValue}, newValue: ${newValue}, change: ${change}`);
 
         if (change == 0) {
-            return <span class='text-primary'> (+ 0)</span>;
+            return <span className='text-primary'> (+ 0)</span>;
         } else if (change > 0) {
-            return <span class='text-success'> (+ ${change})</span>;
+            return <span className='text-success'> (+ ${change})</span>;
         } else {
-            return <span class='text-danger'> (- ${change})</span>;
+            return <span className='text-danger'> (- ${change})</span>;
         }
         return " (---)"
     }

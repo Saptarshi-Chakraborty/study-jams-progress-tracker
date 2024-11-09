@@ -1,7 +1,6 @@
 "use client";
 
-import Link from 'next/link'
-import React from 'react'
+import Link from 'next/link';
 
 const OrganizerNavbar = ({ user }) => {
     return (
@@ -10,6 +9,9 @@ const OrganizerNavbar = ({ user }) => {
             <Link href="/upload" className="link-light fs-6 link-offset-1 link-offset-2-hover mx-2">Upload Report</Link>
 
             <Link href="/dashboard" className="link-light fs-6 link-offset-1 link-offset-2-hover mx-2">View Report</Link>
+
+            <Link href="/participants-details" className="link-light fs-6 link-offset-1 link-offset-2-hover mx-2">Participants Details</Link>
+
 
         </div>
     )
