@@ -1,20 +1,24 @@
 "use client";
 
+import CertificatesBody from '@/component/certificates/Body';
 import Footer from '@/component/Footer';
 import Navbar from '@/component/Navbar';
-import UploadBody from '@/component/upload/UploadBody';
 import Head from 'next/head';
-import { ToastContainer } from 'react-toastify';
+import React from 'react'
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const upload = () => {
+
+
+    
     return (<>
         <Head>
-            <title>Upload Page | Study Jams Progress Tracker</title>
+            <title>Certificates | Study Jams Progress Tracker</title>
         </Head>
 
         <Navbar />
-        <UploadBody />
+        <CertificatesBody />
         <Footer />
         <ToastContainer theme='colored' position='top-center' />
     </>);

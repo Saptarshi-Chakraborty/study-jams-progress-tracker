@@ -52,6 +52,10 @@ const ALL_ARCADE_GAMES = [
         name: "Level 3: Google Cloud Adventures",
         url: "",
     },
+    {
+        name: "Diwali in The Arcade",
+        url: "",
+    }
 ]
 
 export { ALL_SKILL_BADGES, ALL_ARCADE_GAMES };

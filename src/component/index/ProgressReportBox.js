@@ -3,6 +3,7 @@ import appwrite from '@/utils/appwrite';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
+import MyCertificates from './MyCertificates';
 
 const ProgressReportBox = ({ user, progressReport }) => {
 
@@ -45,7 +46,7 @@ const ProgressReportBox = ({ user, progressReport }) => {
 
             {/* All Completed Congratulations Message */}
             {
-                (progressReport?.codeRedemptionStatus == "Yes" && progressReport.noOfArcadeGamesCompleted == 1 && progressReport.noOfSkillBadgesCompleted == 15) &&
+                (progressReport?.codeRedemptionStatus == "Yes" && Number(progressReport.noOfArcadeGamesCompleted) >= 1 && progressReport.noOfSkillBadgesCompleted == 15) &&
                 <div className="alert alert-success">Congratulations! 🎉 You have completed all the requirements for the GenAI Study Jams 2024 🚀</div>
             }
 
@@ -71,6 +72,7 @@ const ProgressReportBox = ({ user, progressReport }) => {
                             )
                         })
                     }
+                    <p className="mb-0 text-primary fw-bold">Note: Any one completion of these two is counted.</p>
                 </div>
             </div>
 
@@ -98,6 +100,11 @@ const ProgressReportBox = ({ user, progressReport }) => {
                     }
                 </div>
             </div>
+            
+            {
+                (progressReport?.chapterName) &&
+                <MyCertificates email={progressReport.email} />
+            }
 
             {
                 (progressReport?.chapterName) &&

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import ArcadeGameDetails from '../dashboard/ArcadeGameDetails';
 import SkillsBadgeDetails from '../dashboard/SkillsBadgeDetails';
 
-const ParticipantsDetails = ({ latestReport }) => {
+const ParticipantsDetails = ({ latestReport, setLatestReport, allReports }) => {
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [hasFetchedParticipants, setHasFetchedParticipants] = useState(false);
@@ -14,6 +14,7 @@ const ParticipantsDetails = ({ latestReport }) => {
     async function fetchParticipants() {
         const participantsLength = parseInt(latestReport.noOfParticipants);
         console.log(`Number of participants: ${participantsLength}`);
+        console.log(latestReport.reportDate);
 
         try {
             setLoading(true);
@@ -51,8 +52,20 @@ const ParticipantsDetails = ({ latestReport }) => {
 
     }
 
+    async function changeLatestReport(e) {
+        console.log('changeLatestReport');
+
+        try {
+            const report = await allReports.find(report => report.$id === e.target.value);
+            console.log(report);
+            setLatestReport(report);
+        } catch (error) {
+            console.error('Failed to change report date', error);
+        }
+    }
+
     useEffect(() => {
-        if (latestReport && participants.length === 0)
+        if (latestReport && latestReport.$id)
             fetchParticipants();
     }, [latestReport]);
 
@@ -74,6 +87,18 @@ const ParticipantsDetails = ({ latestReport }) => {
 
         } */}
 
+        <div className="input-group mt-3">
+            <label className="input-group-text" htmlFor="inputGroupSelect01">Report Date</label>
+            <select className="form-select" aria-label="Default select example" value={latestReport.$id} onChange={changeLatestReport}>
+                {
+                    allReports.map((report, index) => {
+                        return <option key={index} value={report.$id}>{new Date(report.reportDate).toDateString()}</option>
+                    })
+                }
+            </select>
+            <button className="btn btn-warning" onClick={fetchParticipants} disabled={loading}>Refresh</button>
+        </div>
+
         {(hasFetchedParticipants && participants.length) > 0 &&
             <div className="d-flex flex-row justify-content-between align-items-center mt-2">
 
@@ -81,52 +106,49 @@ const ParticipantsDetails = ({ latestReport }) => {
                     <p className="text-muted mb-0">Press <kbd>Crtl + F</kbd> in keyboard to search for a participant</p>
                 </div>
 
-                <button className="btn btn-warning mb-3" onClick={fetchParticipants}>Refresh</button>
+                {/* <button className="btn btn-warning mb-3" onClick={fetchParticipants}>Refresh</button> */}
             </div>
         }
 
-        {
-            (hasFetchedParticipants && participants.length) > 0 &&
+        {(hasFetchedParticipants && participants.length) > 0 &&
             <div className="accordion my-3" id="participantsAccordian">
-                {
-                    participants.map((participant, index) => {
-                        return (
-                            <div className="accordion-item" key={participant.$id}>
-                                <h2 className="accordion-header">
-                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#paac${participant.$id}`} aria-expanded="false" aria-controls={`paac${participant.$id}`}>
-                                        {participant.name} - {participant.email}
-                                        {
-                                            participant.codeRedemptionStatus === "Yes" ?
-                                                <span className="badge bg-success ms-2 small">Redeemed</span> :
-                                                <span className="badge bg-danger ms-2">Not Redeemed</span>
-                                        }
-                                        <span className="text-primary ms-2">(arcade: {participant.noOfArcadeGamesCompleted})</span>
-                                        <span className="text-danger ms-2">(skill badges: {participant.noOfSkillBadgesCompleted})</span>
-                                    </button>
-                                </h2>
+                {participants.map((participant, index) => {
+                    return (
+                        <div className="accordion-item" key={participant.$id}>
+                            <h2 className="accordion-header">
+                                <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#paac${participant.$id}`} aria-expanded="false" aria-controls={`paac${participant.$id}`}>
+                                    {participant.name} - {participant.email}
+                                    {
+                                        participant.codeRedemptionStatus === "Yes" ?
+                                            <span className="badge bg-success ms-2 small">Redeemed</span> :
+                                            <span className="badge bg-danger ms-2">Not Redeemed</span>
+                                    }
+                                    <span className="text-primary ms-2">(arcade: {participant.noOfArcadeGamesCompleted})</span>
+                                    <span className="text-danger ms-2">(skill badges: {participant.noOfSkillBadgesCompleted})</span>
+                                </button>
+                            </h2>
 
-                                <div id={`paac${participant.$id}`} className="accordion-collapse collapse" data-bs-parent="#participantsAccordian">
-                                    <div className="accordion-body">
-                                        <p className='fs-5 mb-0'>{participant.name}</p>
-                                        <p className='fs-6 mb-1 text-black'>{participant.email}</p>
-                                        {
-                                            participant.codeRedemptionStatus === "Yes" ?
-                                                <span className="badge bg-success mb-2">Both Code Redeemed</span> :
-                                                <span className="badge bg-danger mb-2">Code Not Redeemed</span>
-                                        }
+                            <div id={`paac${participant.$id}`} className="accordion-collapse collapse" data-bs-parent="#participantsAccordian">
+                                <div className="accordion-body">
+                                    <p className='fs-5 mb-0'>{participant.name}</p>
+                                    <p className='fs-6 mb-1 text-black'>{participant.email}</p>
+                                    {
+                                        participant.codeRedemptionStatus === "Yes" ?
+                                            <span className="badge bg-success mb-2">Both Code Redeemed</span> :
+                                            <span className="badge bg-danger mb-2">Code Not Redeemed</span>
+                                    }
 
-                                        <a href={participant?.profileUrl} target="_blank" className=" ms-2 fs-6">View Public Profile</a>
+                                    <a href={participant?.profileUrl} target="_blank" className=" ms-2 fs-6">View Public Profile</a>
 
-                                        <ArcadeGameDetails progressReport={participant} />
+                                    <ArcadeGameDetails progressReport={participant} />
 
-                                        <SkillsBadgeDetails progressReport={participant} />
+                                    <SkillsBadgeDetails progressReport={participant} />
 
-                                    </div>
                                 </div>
                             </div>
-                        )
-                    })
-                }
+                        </div>
+                    )
+                })}
             </div>
         }
 

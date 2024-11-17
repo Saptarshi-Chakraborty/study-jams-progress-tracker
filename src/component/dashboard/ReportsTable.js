@@ -117,7 +117,7 @@ const DifferenceMarker = ({ oldValue, newValue }) => {
     } else if (change > 0) {
         return <span className='text-success'> (+{change})</span>
     } else {
-        return <span className='text-danger'> (-${change})</span>;
+        return <span className='text-danger'> ({change})</span>;
     }
     return " (---)"
 }

@@ -1,7 +1,7 @@
 import { ALL_ARCADE_GAMES } from '@/utils/allLabs'
 import React from 'react'
 
-const ArcadeGameDetails = ({progressReport}) => {
+const ArcadeGameDetails = ({ progressReport }) => {
     // console.log("progressReport");
     // console.log(progressReport);
 
@@ -28,6 +28,8 @@ const ArcadeGameDetails = ({progressReport}) => {
                     )
                 })
             }
+
+            <p className="mb-0 text-primary fw-bold">Note: Any one completion of these two is counted.</p>
         </div>
     </div >)
 }

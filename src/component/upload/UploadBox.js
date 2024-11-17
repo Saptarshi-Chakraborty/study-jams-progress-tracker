@@ -62,7 +62,7 @@ const UploadBox = ({ user, setUser }) => {
             if (item['# of Skill Badges Completed'] == "15")
                 noOfSkillsBageCompletion += 1;
 
-            if (item['# of Arcade Games Completed'] == "1")
+            if (item['# of Arcade Games Completed'] == "1" || item['# of Arcade Games Completed'] == "2")
                 noOfArcadeGamesCompletion += 1;
 
             if (item['All Skill Badges & Games Completed'] === "Yes")

@@ -14,6 +14,7 @@ const ParticipantsDetailsBody = () => {
     const [loading, setLoading] = useState(true);
     const [latestReport, setLatestReport] = useState(null);
     const [hasFetchedReports, setHasFetchedReports] = useState(false);
+    const [allReports, setAllReports] = useState([]);
 
     async function logout() {
         let session;
@@ -73,7 +74,7 @@ const ParticipantsDetailsBody = () => {
                     appwrite.Query.equal('uploadedBy', user.$id),
                     appwrite.Query.orderDesc('reportDate'),
                     appwrite.Query.equal('isDeleted', false),
-                    appwrite.Query.limit(1)
+                    appwrite.Query.limit(30)
                 ]
             );
             console.log(response);
@@ -81,6 +82,7 @@ const ParticipantsDetailsBody = () => {
 
             if (response.documents.length > 0) {
                 setLatestReport(response.documents[0]);
+                setAllReports(response.documents);
             } else {
                 setLatestReport(null);
                 toast.info('No reports found. Please upload a report to view it here.');
@@ -141,7 +143,7 @@ const ParticipantsDetailsBody = () => {
             {
                 (hasFetchedReports && latestReport) &&
                 <>
-                    <ParticipantsDetails latestReport={latestReport} />
+                    <ParticipantsDetails latestReport={latestReport} allReports={allReports} setLatestReport={setLatestReport} />
                 </>
             }
 
